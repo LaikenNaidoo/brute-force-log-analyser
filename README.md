@@ -4,6 +4,8 @@ A small Python tool that reads a Linux SSH authentication log (`auth.log`), flag
 
 Built for the **Tech Mentorship Program 2026, Cybersecurity Track** (focus area: Incident Response).
 
+---
+
 ## 1. Problem
 
 Small teams and beginners often cannot tell from raw SSH logs whether a server is being attacked. Thousands of lines of failed logins are hard to read by eye. This tool does the counting and produces a short, readable report that shows who is attacking, how often, and what to do about it.
@@ -15,6 +17,7 @@ Small teams and beginners often cannot tell from raw SSH logs whether a server i
 | Parse SSH `Failed password` and `Accepted password` lines from `auth.log` | Working |
 | **Rule 1:** Brute-force detection (many failed logins from one IP inside a time window) | Working |
 | Markdown incident report (summary counts, alert table, containment advice) | Working |
+| Native Kali Linux log format (ISO-8601 timestamps, `sshd-session` entries) | Not supported yet (priority future work) |
 | Password-spraying rule (one IP trying many usernames) | Not yet built (future work) |
 | Rule: successful login right after repeated failures | Not yet built (future work) |
 
@@ -47,6 +50,14 @@ python3 analyser.py
 ```
 
 The tool reads `auth.log` from the same folder and writes `incident_report.md` there. To analyse your own log, replace `auth.log` with your file, or change the `log_file` value at the bottom of `analyser.py`.
+
+**Supported log format:** classic syslog-style lines, for example:
+
+```
+Oct 26 18:01:12 ubuntu sshd[1234]: Failed password for invalid user admin from 203.0.113.50 port 51122 ssh2
+```
+
+Logs that use ISO-8601 timestamps and `sshd-session` entries (for example current Kali Linux) are not recognised yet. See sections 10 and 11.
 
 On success you will see:
 
@@ -89,11 +100,31 @@ This is output from sample data, not from a live attack.
 
 ## 10. Test notes
 
-- Tested on the included sample log (`auth.log`); output saved in `incident_report.md`.
-- [TO BE COMPLETED BY THE TEAM: results from testing on logs generated in our own lab VM, including what was detected, what was missed, and any false alarms.]
+**Test 1: sample log.** The tool was run on the included sample log (`auth.log`). It parsed 9 events and raised 1 HIGH alert for `192.168.1.50`. Output saved in `incident_report.md`.
+
+**Test 2: Kali Linux VM** (carried out by Victoria Atieno).
+
+- Environment: Kali Linux in Oracle VirtualBox, OpenSSH server active on port 22, account `kali`.
+- Failed logins: 6 incorrect-password attempts (2 SSH sessions with 3 each) in about 1 minute, from `127.0.0.1` (local loopback, tested inside the VM).
+- Normal logins: 3 successful SSH logins.
+
+| Test | Expected | Result |
+|---|---|---|
+| Native Kali log (6 failed + 3 accepted logins) | Events parsed, 1 alert | **0 events parsed, 0 alerts** (format not recognised) |
+| Normalised copy of the 6 failed records | 1 HIGH alert | 1 HIGH alert |
+| 3 normal successful logins | No alert | 0 alerts |
+
+**What this shows**
+
+- The detection rule works: on correctly formatted records, 6 failures in about a minute were flagged as a HIGH brute-force alert, and normal logins raised no false alarm.
+- The parser does not read Kali's native log format. It expects classic syslog timestamps (`Oct 26 18:01:12`) and `sshd[pid]`, but Kali writes ISO-8601 timestamps (`2026-11-05T04:37:15-05:00`) and `sshd-session[pid]`. The alert above was produced only after the records were reformatted.
+- The attacks came from the loopback address inside the VM, so they do not show how the tool behaves against a separate remote machine or a large number of attempts.
+
+Screenshots and the raw VM log are included in the team's technical report.
 
 ## 11. Known limitations
 
+- **Log format:** only classic syslog-style lines are parsed. Native Kali logs (ISO-8601 timestamps and `sshd-session` entries) produced 0 parsed events in testing.
 - Only the brute-force rule is implemented. Password spraying and "success after failures" are not detected yet.
 - Only `Failed password` and `Accepted password` lines are parsed. Other SSH events (for example key-based logins or other failure messages) are ignored.
 - Log timestamps do not contain a year, so the tool assumes the current year.
@@ -104,6 +135,7 @@ This is output from sample data, not from a live attack.
 
 ## 12. Future work
 
+- **Priority:** support ISO-8601 timestamps and `sshd-session` entries, then re-test on the native Kali log
 - Password-spraying detection
 - Detection of a successful login after repeated failures
 - Configurable thresholds (config file or command-line options)
@@ -116,7 +148,7 @@ This is output from sample data, not from a live attack.
 |---|---|
 | Laiken Naidoo (Group Leader) | Wrote the technical project report; developed the core Python script for regex-based SSH log parsing; built the sliding time-window detection rule and the automated Markdown report generator |
 | Wisdom Osagede | README documentation and compilation of the final technical report |
-| [Member name] | [Contribution] |
+| Victoria Atieno | Tested the analyser on Kali Linux, simulated SSH attacks, verified the detection results, and collected evidence and documented the findings |
 | [Member name] | [Contribution] |
 | [Member name] | [Contribution] |
 
