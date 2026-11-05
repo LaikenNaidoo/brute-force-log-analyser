@@ -1,15 +1,8 @@
-Brute-Force Log Analyser
+# Brute-Force Log Analyser
 
 A small Python tool that reads a Linux SSH authentication log (`auth.log`), flags brute-force login activity, and writes a Markdown incident report with the suspicious IP addresses and recommended containment actions.
-rrent year.
-- Thresholds are set in the code, not in a configuration file.
-- An IP is flagged once, even if it attacks repeatedly later.
-- The containment recommendations in the report are fixed text and are not tailored to each alert.
-- Works offline on one log file; it is not a live monitoring tool.
 
-
-
-
+Built for the **Tech Mentorship Program 2026, Cybersecurity Track** (focus area: Incident Response).
 
 ## 1. Problem
 
@@ -103,11 +96,11 @@ This is output from sample data, not from a live attack.
 
 - Only the brute-force rule is implemented. Password spraying and "success after failures" are not detected yet.
 - Only `Failed password` and `Accepted password` lines are parsed. Other SSH events (for example key-based logins or other failure messages) are ignored.
-- Log timestamps do not contain a year, so the tool assumes the cuated Markdown report generator |
-| Wisdom Osagede | README documentation and compilation of the final technical report |
-| [Member name] | [Contribution] |
-| [Member name] | [Contribution] |
-| [Member name] | [Contribution] |
+- Log timestamps do not contain a year, so the tool assumes the current year.
+- Thresholds are set in the code, not in a configuration file.
+- An IP is flagged once, even if it attacks repeatedly later.
+- The containment recommendations in the report are fixed text and are not tailored to each alert.
+- Works offline on one log file; it is not a live monitoring tool.
 
 ## 12. Future work
 
@@ -115,15 +108,17 @@ This is output from sample data, not from a live attack.
 - Detection of a successful login after repeated failures
 - Configurable thresholds (config file or command-line options)
 - Support for more log events and formats
-- HTML report and live monitoring## 13. Team and contributions
+- HTML report and live monitoring
+
+## 13. Team and contributions
 
 | Member | Contribution |
 |---|---|
-| Laiken Naidoo (Group Leader) | Wrote the technical project report; developed the core Python script for regex-based SSH log parsing; built the sliding time-window detection rule and the automated Markdown report generator
-Built for the **Tech Mentorship Program 2026, Cybersecurity Track** (focus area: Incident Response).
-
----
-- 
+| Laiken Naidoo (Group Leader) | Wrote the technical project report; developed the core Python script for regex-based SSH log parsing; built the sliding time-window detection rule and the automated Markdown report generator |
+| Wisdom Osagede | README documentation and compilation of the final technical report |
+| [Member name] | [Contribution] |
+| [Member name] | [Contribution] |
+| [Member name] | [Contribution] |
 
 ## 14. Repository
 
