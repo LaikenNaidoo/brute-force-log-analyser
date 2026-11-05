@@ -147,10 +147,8 @@ Screenshots and the raw VM log are included in the team's technical report.
 | Member | Contribution |
 |---|---|
 | Laiken Naidoo (Group Leader) | Wrote the technical project report; developed the core Python script for regex-based SSH log parsing; built the sliding time-window detection rule and the automated Markdown report generator |
-| Wisdom Osagede | README documentation and compilation of the final technical report |
+| Wisdom Osagede | Wrote the README documentation, compiled the final technical report, and created the project presentation slides |
 | Victoria Atieno | Tested the analyser on Kali Linux, simulated SSH attacks, verified the detection results, and collected evidence and documented the findings |
-| [Member name] | [Contribution] |
-| [Member name] | [Contribution] |
 
 ## 14. Repository
 
